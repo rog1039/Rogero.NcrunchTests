@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Infrastructure;
+using Rogero.NcrunchTests.SharedState.Tests.NCrunch.Framework;
 using Xunit;
 
 namespace Rogero.NcrunchTests.SharedState.Tests
@@ -13,14 +17,24 @@ namespace Rogero.NcrunchTests.SharedState.Tests
         private Action _action;
         private DbContextOptions _options;
 
+        private static ConcurrentQueue<string> _consoleMessages = new ConcurrentQueue<string>(); 
+
         public ContextSharedStateTests()
         {
+            PrintProcessAndThreadInfo();
             _action = () => _onModelCreatingCallCount += 1;
             var optionsBuilder = new DbContextOptionsBuilder();
             optionsBuilder.UseInMemoryDatabase();
             _options = optionsBuilder.Options;
 
             _context = new DatabaseContext(_action, _options);
+
+
+            Thread.Sleep(1000);
+            PrintProcessAndThreadInfo();
+            Thread.Sleep(1000);
+            PrintProcessAndThreadInfo();
+            Thread.Sleep(1000);
         }
 
 
@@ -46,6 +60,7 @@ namespace Rogero.NcrunchTests.SharedState.Tests
         /// </summary>
         [Fact()]
         [Trait("Category", "Instant")]
+        [Isolated]
         public void OnModelCreatingShouldBeCalledA()
         {
             _onModelCreatingCallCount = 0;
@@ -55,6 +70,7 @@ namespace Rogero.NcrunchTests.SharedState.Tests
         
         [Fact()]
         [Trait("Category", "Instant")]
+        [Isolated]
         public void OnModelCreatingShouldBeCalledB()
         {
             _onModelCreatingCallCount = 0;
@@ -71,6 +87,7 @@ namespace Rogero.NcrunchTests.SharedState.Tests
         /// </summary>
         [Fact()]
         [Trait("Category", "Instant")]
+        [Isolated]
         public void OnModelCreatingShouldOnlyBeCalledOnce()
         {
             _onModelCreatingCallCount = 0;
@@ -86,6 +103,20 @@ namespace Rogero.NcrunchTests.SharedState.Tests
             var entityACount3 = _context.EntityA.Count();
 
             Assert.Equal(1, _onModelCreatingCallCount);
+        }
+
+        private void PrintProcessAndThreadInfo()
+        {
+            var message = $"[{DateTime.Now:hh:mm:ss.ffff}] PID: {Process.GetCurrentProcess().Id,4}, ThreadId: {Thread.CurrentThread.ManagedThreadId,-2}";
+            _consoleMessages.Enqueue(message);
+            Console.WriteLine(message);
+        }
+    }
+
+    namespace NCrunch.Framework
+    {
+        public class IsolatedAttribute : Attribute
+        {
         }
     }
 }
