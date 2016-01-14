@@ -210,3 +210,5 @@ FakesAssemblies/
 GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
+/Rogero.NcrunchTests.SharedState.Tests/Rogero.NcrunchTests.SharedState.Tests.csproj.csdat
+/Rogero.NcrunchTests.SharedState/Rogero.NcrunchTests.SharedState.csproj.csdat
