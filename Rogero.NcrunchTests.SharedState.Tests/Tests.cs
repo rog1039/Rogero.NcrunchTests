@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading;
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Infrastructure;
-using Rogero.NcrunchTests.SharedState.Tests.NCrunch.Framework;
+using NCrunch.Framework;
 using Xunit;
 
 namespace Rogero.NcrunchTests.SharedState.Tests
@@ -112,11 +112,11 @@ namespace Rogero.NcrunchTests.SharedState.Tests
             Console.WriteLine(message);
         }
     }
+}
 
-    namespace NCrunch.Framework
+namespace NCrunch.Framework
+{
+    public class IsolatedAttribute : Attribute
     {
-        public class IsolatedAttribute : Attribute
-        {
-        }
     }
 }
